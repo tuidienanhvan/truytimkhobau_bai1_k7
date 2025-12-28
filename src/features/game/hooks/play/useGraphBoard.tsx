@@ -78,8 +78,23 @@ export const useGraphBoard = (
         board.on('move', (e: any) => {
             const now = Date.now();
             if (now - lastMoveTime.current > 32) {
-                const cPos = board.getUsrCoordsOfMouse(e);
-                onCursorMoveRef.current(parseFloat(cPos[0].toFixed(1)), parseFloat(cPos[1].toFixed(1)));
+                // Manual coordinate calculation instead of getUsrCoordsOfMouse
+                const rect = boxRef.current!.getBoundingClientRect();
+                const clientX = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+                const clientY = e.clientY ?? e.touches?.[0]?.clientY ?? 0;
+
+                const mouseX = clientX - rect.left;
+                const mouseY = clientY - rect.top;
+
+                // board.origin.scrCoords[1] = pixel X of origin (0,0)
+                // board.origin.scrCoords[2] = pixel Y of origin (0,0)
+                const userX = (mouseX - board.origin.scrCoords[1]) / board.unitX;
+                const userY = (board.origin.scrCoords[2] - mouseY) / board.unitY;
+
+                onCursorMoveRef.current(
+                    parseFloat(userX.toFixed(1)),
+                    parseFloat(userY.toFixed(1))
+                );
                 lastMoveTime.current = now;
             }
         });
