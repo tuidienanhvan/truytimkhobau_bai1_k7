@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <!-- FIX #11, #12, #67: Viewport & PWA Settings -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Săn Sao">
+    <meta name="theme-color" content="#000000">
+    
+    <title>Săn Sao - PiStudy</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@400;500;700&display=swap&subset=vietnamese" rel="stylesheet">
+    
+    <!-- FIX #10: Critical CSS Inline -->
+    <style>
+      /* FIX #7: Strict Box Model */
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      /* FIX #9: Anti-flash Black Background */
+      html, body {
+        /* FIX #14, #88: Scroll Jail - Critical for iOS */
+        position: fixed; 
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #000000; 
+        overflow: hidden;
+        
+        /* FIX #13: Disable Browser Gestures */
+        touch-action: none;
+        
+        /* FIX #14: Disable Pull-to-refresh */
+        overscroll-behavior: none;
+        
+        /* FIX #15: Disable Text Selection */
+        -webkit-user-select: none;
+        user-select: none;
+        
+        /* FIX #18: Disable iOS Callout (Magnifier/Menu) */
+        -webkit-touch-callout: none;
+        
+        /* FIX #20: Font Smoothing */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        
+        -webkit-tap-highlight-color: transparent;
+        font-family: 'Roboto', -apple-system, sans-serif;
+      }
+
+      /* FIX #16: Prevent iOS Input Zoom */
+      input, textarea, select {
+        font-size: 16px !important;
+        user-select: text;
+        -webkit-user-select: text;
+      }
+      
+      /* FIX #19: Disable Image Dragging */
+      img {
+        -webkit-user-drag: none;
+        user-drag: none;
+        pointer-events: none;
+      }
+
+      #root {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      
+      /* FIX #71: Layer Isolation helpers */
+      .isolation-isolate { isolation: isolate; }
+      .contain-layout-paint { contain: layout paint; }
+      .contain-strict { contain: strict; }
+      
+      /* SVG optimizations */
+      svg { shape-rendering: geometricPrecision; }
+      
+      /* Custom Scrollbar */
+      .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: #05070a; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #1E2330; border-radius: 4px; border: 1px solid #00F0FF; }
+      
+      mjx-container { color: inherit !important; outline: none !important; }
+      
+      /* Glitch Effects */
+      .glitch-text { position: relative; }
+      .glitch-text::before, .glitch-text::after {
+        content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      }
+      .glitch-text::before {
+        left: 2px; text-shadow: -1px 0 #FF003C; clip: rect(24px, 550px, 90px, 0); animation: glitch-anim-2 3s infinite linear alternate-reverse;
+      }
+      .glitch-text::after {
+        left: -2px; text-shadow: -1px 0 #00F0FF; clip: rect(85px, 550px, 140px, 0); animation: glitch-anim 2.5s infinite linear alternate-reverse;
+      }
+      @keyframes glitch-anim {
+        0% { clip: rect(10px, 9999px, 31px, 0); }
+        20% { clip: rect(70px, 9999px, 86px, 0); }
+        40% { clip: rect(25px, 9999px, 63px, 0); }
+        60% { clip: rect(55px, 9999px, 10px, 0); }
+        80% { clip: rect(10px, 9999px, 78px, 0); }
+        100% { clip: rect(45px, 9999px, 60px, 0); }
+      }
+      @keyframes glitch-anim-2 {
+        0% { clip: rect(65px, 9999px, 100px, 0); }
+        20% { clip: rect(15px, 9999px, 45px, 0); }
+        40% { clip: rect(80px, 9999px, 5px, 0); }
+        60% { clip: rect(10px, 9999px, 65px, 0); }
+        80% { clip: rect(95px, 9999px, 20px, 0); }
+        100% { clip: rect(35px, 9999px, 80px, 0); }
+      }
+    </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        svg: { fontCache: 'global' },
+        startup: { typeset: false }
+      };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+      const SYSTEM_FONT_STACK = '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"';
+
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Roboto', ...SYSTEM_FONT_STACK.split(',')],
+              tech: ['"Roboto Mono"', 'Roboto', ...SYSTEM_FONT_STACK.split(',')], 
+              mono: ['"Roboto Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
+            },
+            colors: {
+              space: { 950: '#05070a', 900: '#0B0E14', 800: '#151923', 700: '#1E2330' },
+              neon: { blue: '#00F0FF', pink: '#FF003C', green: '#0AFF60', yellow: '#FCEE0A' }
+            },
+            backgroundImage: {
+              'grid-pattern': "linear-gradient(to right, rgba(255,255,255,0.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.12) 1px, transparent 1px)",
+              'scanline': 'linear-gradient(to bottom, transparent, transparent 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1))',
+            },
+            animation: {
+              'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'glitch': 'glitch 1s linear infinite',
+              'twinkle': 'twinkle 1s ease-in-out infinite alternate',
+              'hover-engine': 'hover-engine 3s ease-in-out infinite',
+            },
+            keyframes: {
+              'pulse-glow': {
+                '0%, 100%': { opacity: 1, filter: 'drop-shadow(0 0 5px rgba(0, 240, 255, 0.7))' },
+                '50%': { opacity: .7, filter: 'drop-shadow(0 0 2px rgba(0, 240, 255, 0.3))' },
+              },
+              'twinkle': {
+                '0%': { opacity: '1', filter: 'drop-shadow(0 0 5px rgba(252, 238, 10, 0.8))' },
+                '100%': { opacity: '0.4', filter: 'drop-shadow(0 0 1px rgba(252, 238, 10, 0.2))' }
+              },
+              'hover-engine': {
+                '0%, 100%': { transform: 'translateY(0px)' },
+                '50%': { transform: 'translateY(-15px)' }
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@^19.2.3",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+        "react/": "https://esm.sh/react@^19.2.3/",
+        "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+        "zustand": "https://esm.sh/zustand@^5.0.9"
+      }
+    }
+    </script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-black" oncontextmenu="return false;">
+    <div id="root"></div>
+    <script type="module" src="./index.tsx"></script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
