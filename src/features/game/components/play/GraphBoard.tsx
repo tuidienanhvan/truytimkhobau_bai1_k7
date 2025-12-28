@@ -16,7 +16,7 @@ export const GraphBoard: React.FC<GraphBoardProps> = React.memo(({
   const { boxRef } = useGraphBoard(currentStep, coordinates, onCursorMove, onPointClick);
 
   return (
-    <div className="w-full h-full relative bg-[#020408] overflow-hidden flex items-center justify-center group transform-gpu">
+    <div className="w-full h-full relative bg-[#020408] overflow-hidden group transform-gpu">
 
       {/* 1. DEEP SPACE BACKGROUND */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#0f172a_0%,#000000_100%)] z-0 pointer-events-none"></div>
